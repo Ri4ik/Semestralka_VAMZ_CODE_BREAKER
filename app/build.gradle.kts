@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.androidx.room.runtime.android)
+    implementation(libs.cronet.embedded)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
