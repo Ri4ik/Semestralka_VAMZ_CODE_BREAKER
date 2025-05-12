@@ -26,19 +26,21 @@ class GameViewModel : ViewModel() {
     private val _attemptsUsed = MutableStateFlow(0)
     val attemptsUsed: StateFlow<Int> = _attemptsUsed.asStateFlow()
 
-    private val currentGuess = mutableListOf<Int>()
+    val _currentGuess = MutableStateFlow(List(4) { 0 })
+    val currentGuess: StateFlow<List<Int>> = _currentGuess.asStateFlow()
 
     fun setGuessAt(index: Int, value: Int) {
-        while (currentGuess.size <= index) currentGuess.add(0)
-        currentGuess[index] = value
+        _currentGuess.value = _currentGuess.value.toMutableList().also {
+            it[index] = value
+        }
     }
 
     fun submitGuess() {
-        if (_gameFinished.value || currentGuess.size != secretCode.size) return
-
-        val (exact, partial) = evaluateGuess(secretCode, currentGuess)
+        if (_gameFinished.value || _currentGuess.value.size != secretCode.size) return
+        val current = _currentGuess.value
+        val (exact, partial) = evaluateGuess(secretCode, current)
         val result = GuessState(
-            guess = currentGuess.toList(),
+            guess = current,
             exact = exact,
             partial = partial,
             isCorrect = exact == secretCode.size
@@ -51,16 +53,19 @@ class GameViewModel : ViewModel() {
             _gameFinished.value = true
         }
 
-        currentGuess.clear()
+        // Скидаємо currentGuess назад у 0000
+//        _currentGuess.value = List(secretCode.size) { 0 }
     }
     fun updateGuess(index: Int, value: Int) {
-        currentGuess[index] = value
+        _currentGuess.value = _currentGuess.value.toMutableList().also {
+            if (index in it.indices) it[index] = value
+        }
     }
     fun startNewGame() {
         _guessHistory.value = emptyList()
         _attemptsUsed.value = 0
         _gameFinished.value = false
-        currentGuess.clear()
+        _currentGuess.value = List(secretCode.size) { 0 }
         // TODO: regenerate secretCode if needed
     }
 

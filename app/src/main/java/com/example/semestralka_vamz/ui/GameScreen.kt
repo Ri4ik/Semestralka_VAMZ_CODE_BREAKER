@@ -54,16 +54,14 @@ fun GameScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Створюємо нову змінну — активний масив з ViewModel
+        val currentGuess by viewModel.currentGuess.collectAsState()
         // Aktívny pokus – výber 4 čísel
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             repeat(4) { index ->
-                var selected by remember { mutableStateOf(0) }
                 DropdownMenuGuess(
-                    selected = selected,
-                    onSelect = {
-                        selected = it
-                        viewModel.setGuessAt(index, it)
-                    }
+                    selected = currentGuess.getOrElse(index) { 0 },
+                    onSelect = { viewModel.setGuessAt(index, it) }
                 )
             }
         }
