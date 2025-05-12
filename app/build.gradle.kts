@@ -7,6 +7,9 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.kapt")
+//    id("com.google.dagger.hilt.android")
+//    kotlin("kapt")
 }
 
 android {
@@ -105,4 +108,13 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+//    //Hilt
+//    implementation("com.google.dagger:hilt-android:2.51")
+////    kapt("com.google.dagger:hilt-compiler:2.51")
+//    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    //ROOM
+//    implementation("androidx.room:room-runtime:2.6.1")
+//    kapt("androidx.room:room-compiler:2.6.1")
 }
