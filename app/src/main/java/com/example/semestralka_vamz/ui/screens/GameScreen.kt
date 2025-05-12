@@ -1,4 +1,4 @@
-package ui
+package com.example.semestralka_vamz.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

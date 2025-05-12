@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Semestralka_vamz</string>
+    <string name="rules_guess_code">Uhádni tajný kód</string>
+    <string name="rules_feedback_info">Každý tip ti ukáže spätnú väzbu:</string>
+
+    <string name="rules_feedback_green">🟩 Správne číslo na správnej pozícii</string>
+    <string name="rules_feedback_yellow">🟨 Správne číslo na zlej pozícii</string>
+    <string name="rules_feedback_blue">🟦 Číslo nie je v kóde</string>
 </resources>

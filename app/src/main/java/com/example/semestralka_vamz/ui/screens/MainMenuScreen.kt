@@ -1,4 +1,4 @@
-package com.example.semestralka_vamz.ui
+package com.example.semestralka_vamz.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -9,9 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.example.semestralka_vamz.R
 
 @Composable
 fun MainMenuScreen(
