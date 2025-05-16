@@ -3,15 +3,28 @@ package com.example.semestralka_vamz
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.semestralka_vamz.navigation.AppNavGraph
+import com.example.semestralka_vamz.ui.theme.AppThemeWrapper
+import com.example.semestralka_vamz.viewmodel.SettingsViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-            AppNavGraph(navController)
+            val settingsViewModel: SettingsViewModel = viewModel()
+            val theme by settingsViewModel.theme.collectAsState()
+
+            AppThemeWrapper(theme = theme) {
+                val navController = rememberNavController()
+                AppNavGraph(
+                    navController = navController,
+                    settingsViewModel = settingsViewModel
+                )
+            }
         }
     }
 }
