@@ -2,16 +2,10 @@ package com.example.semestralka_vamz.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.example.semestralka_vamz.data.model.GuessState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-data class GuessState(
-    val guess: List<Int>,
-    val exact: Int,
-    val partial: Int,
-    val isCorrect: Boolean
-)
 
 class GameViewModel : ViewModel() {
 
@@ -37,14 +31,9 @@ class GameViewModel : ViewModel() {
 
     fun submitGuess() {
         if (_gameFinished.value || _currentGuess.value.size != secretCode.size) return
+
         val current = _currentGuess.value
-        val (exact, partial) = evaluateGuess(secretCode, current)
-        val result = GuessState(
-            guess = current,
-            exact = exact,
-            partial = partial,
-            isCorrect = exact == secretCode.size
-        )
+        val result = evaluateGuess(secretCode, current)
 
         _guessHistory.value = _guessHistory.value + result
         _attemptsUsed.value = _guessHistory.value.size
@@ -52,10 +41,8 @@ class GameViewModel : ViewModel() {
         if (result.isCorrect || _guessHistory.value.size >= maxAttempts) {
             _gameFinished.value = true
         }
-
-        // Скидаємо currentGuess назад у 0000
-//        _currentGuess.value = List(secretCode.size) { 0 }
     }
+
     fun updateGuess(index: Int, value: Int) {
         _currentGuess.value = _currentGuess.value.toMutableList().also {
             if (index in it.indices) it[index] = value
@@ -69,15 +56,15 @@ class GameViewModel : ViewModel() {
         // TODO: regenerate secretCode if needed
     }
 
-    private fun evaluateGuess(secret: List<Int>, guess: List<Int>): Pair<Int, Int> {
-        var exact = 0
-        var partial = 0
+    private fun evaluateGuess(secret: List<Int>, guess: List<Int>): GuessState {
+        val exact = mutableListOf<Int>()
+        val partial = mutableListOf<Int>()
         val used = BooleanArray(secret.size)
         val matched = BooleanArray(guess.size)
 
         for (i in secret.indices) {
             if (guess[i] == secret[i]) {
-                exact++
+                exact += i
                 used[i] = true
                 matched[i] = true
             }
@@ -87,13 +74,20 @@ class GameViewModel : ViewModel() {
             if (matched[i]) continue
             for (j in secret.indices) {
                 if (!used[j] && guess[i] == secret[j]) {
-                    partial++
+                    partial += i
                     used[j] = true
                     break
                 }
             }
         }
 
-        return exact to partial
+        return GuessState(
+            guess = guess,
+            isCorrect = exact.size == secret.size,
+            exactIndices = exact,
+            partialIndices = partial
+        )
     }
+
+
 }

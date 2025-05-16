@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.semestralka_vamz.viewmodel.GuessState
+import com.example.semestralka_vamz.data.model.GuessState
 
 @Composable
 fun GuessRow(guessState: GuessState) {
@@ -24,10 +24,10 @@ fun GuessRow(guessState: GuessState) {
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             guessState.guess.forEachIndexed { index, value ->
-                val color = when {
-                    index < guessState.exact -> Color(0xFF4CAF50) // zelená
-                    index < guessState.exact + guessState.partial -> Color(0xFFFFEB3B) // žltá
-                    else -> Color(0xFF90CAF9) // modrá
+                val color = when (index) {
+                    in guessState.exactIndices -> Color(0xFF4CAF50) // Зелений
+                    in guessState.partialIndices -> Color(0xFFFFEB3B) // Жовтий
+                    else -> Color(0xFF90CAF9) // Блакитний
                 }
                 Box(
                     modifier = Modifier
