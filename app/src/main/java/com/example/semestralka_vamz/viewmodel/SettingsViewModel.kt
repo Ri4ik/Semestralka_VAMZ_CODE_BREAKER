@@ -1,8 +1,8 @@
 package com.example.semestralka_vamz.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.semestralka_vamz.ui.screens.AppLanguage
-import com.example.semestralka_vamz.ui.screens.AppTheme
+import com.example.semestralka_vamz.data.model.AppLanguage
+import com.example.semestralka_vamz.data.model.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

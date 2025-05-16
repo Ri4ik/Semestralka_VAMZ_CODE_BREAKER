@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lámač kódov</string>
+    <string name="menu_new_game">Nová hra</string>
+    <string name="menu_daily_challenge">Denná výzva</string>
+    <string name="menu_rules">Pravidlá</string>
+    <string name="menu_statistics">Štatistiky</string>
+    <string name="menu_settings">Nastavenia</string>
+    <string name="settings_theme">Téma</string>
+    <string name="settings_language">Jazyk</string>
+
+    <string name="rules_guess_code">Uhádni tajný kód</string>
+    <string name="rules_feedback_info">Každý tip ti ukáže spätnú väzbu:</string>
+    <string name="rules_feedback_green">🟩 Správne číslo na správnej pozícii</string>
+    <string name="rules_feedback_yellow">🟨 Správne číslo na zlej pozícii</string>
+    <string name="rules_feedback_blue">🟦 Číslo nie je v kóde</string>
+    <string name="game">Hra</string>
+    <string name="restart">Reštartovať</string>
+    <string name="check_answer">Skontrolovať odpoveď</string>
+    <string name="rules">Pravidlá</string>
+    <string name="rules_feedback_checkmark">Uhádol si správny kód!</string>
+</resources>

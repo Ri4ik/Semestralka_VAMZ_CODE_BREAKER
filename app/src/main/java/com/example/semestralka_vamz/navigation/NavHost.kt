@@ -44,7 +44,8 @@ fun AppNavGraph(
         }
 
         composable(Routes.RULES) {
-            RulesScreen(onBack = { navController.popBackStack() })
+            val theme by settingsViewModel.theme.collectAsState()
+            RulesScreen(onBack = { navController.popBackStack() }, theme = theme)
         }
 
         composable(Routes.STATS) {

@@ -1,5 +1,6 @@
 package com.example.semestralka_vamz
 
+import AppLanguageWrapper
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,13 +18,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settingsViewModel: SettingsViewModel = viewModel()
             val theme by settingsViewModel.theme.collectAsState()
-
-            AppThemeWrapper(theme = theme) {
-                val navController = rememberNavController()
-                AppNavGraph(
-                    navController = navController,
-                    settingsViewModel = settingsViewModel
-                )
+            val language by settingsViewModel.language.collectAsState()
+            AppLanguageWrapper(language = language) {
+                AppThemeWrapper(theme = theme) {
+                    val navController = rememberNavController()
+                    AppNavGraph(
+                        navController = navController,
+                        settingsViewModel = settingsViewModel
+                    )
+                }
             }
         }
     }

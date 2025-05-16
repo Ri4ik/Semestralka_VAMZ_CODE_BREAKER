@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.semestralka_vamz.viewmodel.GameViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.ui.components.DropdownMenuGuess
 import com.example.semestralka_vamz.ui.components.GuessRow
 
@@ -25,7 +27,9 @@ fun GameScreen(
     val attemptsUsed by viewModel.attemptsUsed.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
 
         // Top bar
         Row(
@@ -36,7 +40,10 @@ fun GameScreen(
             IconButton(onClick = onBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
-            Text(text = if (isDailyChallenge) "Daily Challenge" else "Game")
+            Text(text = if (isDailyChallenge) stringResource(R.string.menu_daily_challenge) else stringResource(
+                R.string.game
+            )
+            )
             Text(text = "$attemptsUsed / ${viewModel.maxAttempts}")
         }
 
@@ -74,13 +81,13 @@ fun GameScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = { viewModel.startNewGame() }) {
-                Text("Restart")
+                Text(stringResource(R.string.restart))
             }
             Button(
                 onClick = { viewModel.submitGuess() },
                 enabled = !gameFinished
             ) {
-                Text("Check Answer")
+                Text(stringResource(R.string.check_answer))
             }
         }
     }

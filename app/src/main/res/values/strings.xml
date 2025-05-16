@@ -1,17 +1,22 @@
 <resources>
-    <string name="rules_guess_code">Uhádni tajný kód</string>
-    <string name="rules_feedback_info">Každý tip ti ukáže spätnú väzbu:</string>
-
-    <string name="rules_feedback_green">🟩 Správne číslo na správnej pozícii</string>
-    <string name="rules_feedback_yellow">🟨 Správne číslo na zlej pozícii</string>
-    <string name="rules_feedback_blue">🟦 Číslo nie je v kóde</string>
-
     <string name="app_name">CodeBreaker</string>
-    <string name="new_game">New Game</string>
-    <string name="daily_challenge">Daily Challenge</string>
+    <string name="menu_new_game">New Game</string>
+    <string name="menu_daily_challenge">Daily Challenge</string>
+    <string name="menu_rules">Rules</string>
+    <string name="menu_statistics">Statistics</string>
+    <string name="menu_settings">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_language">Language</string>
+
+    <string name="rules_guess_code">Guess the secret code</string>
+    <string name="rules_feedback_info">Each guess gives you feedback:</string>
+    <string name="rules_feedback_green">🟩 Correct number in the correct position</string>
+    <string name="rules_feedback_yellow">🟨 Correct number in the wrong position</string>
+    <string name="rules_feedback_blue">🟦 Number is not in the code</string>
+    <string name="game">Game</string>
+    <string name="restart">Restart</string>
+    <string name="check_answer">Check Answer</string>
     <string name="rules">Rules</string>
-    <string name="stats">Stats</string>
-    <string name="settings">Settings</string>
-    <string name="theme">Theme</string>
-    <string name="language">Language</string>
+    <string name="rules_feedback_checkmark">You guessed the correct code!</string>
+
 </resources>

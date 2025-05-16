@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.semestralka_vamz.ui.screens.AppTheme
+import com.example.semestralka_vamz.data.model.AppTheme
 
 private val DarkColorScheme = darkColorScheme()
 private val LightColorScheme = lightColorScheme()

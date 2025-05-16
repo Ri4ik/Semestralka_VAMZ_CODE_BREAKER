@@ -12,12 +12,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
-enum class AppTheme { Light, Dark }
-enum class AppLanguage { EN, SK }
-
+import com.example.semestralka_vamz.R
+import com.example.semestralka_vamz.data.model.AppLanguage
+import com.example.semestralka_vamz.data.model.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +34,7 @@ fun MainMenuScreen(
     onLanguageChange: (AppLanguage) -> Unit = {}
 ) {
     var showSettings by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -44,25 +46,25 @@ fun MainMenuScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Text(
-                text = "CodeBreaker",
+                text = stringResource(R.string.app_name),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Button(onClick = onNewGame, modifier = Modifier.fillMaxWidth(0.8f)) {
-                Text("New Game")
+                Text(stringResource(id = R.string.menu_new_game))
             }
 
             Button(onClick = onDailyChallenge, modifier = Modifier.fillMaxWidth(0.8f)) {
-                Text("Daily Challenge")
+                Text(stringResource(id = R.string.menu_daily_challenge))
             }
 
             Button(onClick = onRules, modifier = Modifier.fillMaxWidth(0.8f)) {
-                Text("Rules")
+                Text(stringResource(id = R.string.menu_rules))
             }
 
             Button(onClick = onStats, modifier = Modifier.fillMaxWidth(0.8f)) {
-                Text("Stats")
+                Text(stringResource(id = R.string.menu_statistics))
             }
         }
 
@@ -81,14 +83,17 @@ fun MainMenuScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Theme", style = MaterialTheme.typography.titleMedium)
+                    Text(context.getString(R.string.settings_theme), style = MaterialTheme.typography.titleMedium)
                     AppTheme.entries.forEach { t ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().clickable {
-                                onThemeChange(t)
-                                showSettings = false
-                            }.padding(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onThemeChange(t)
+                                    showSettings = false
+                                }
+                                .padding(8.dp)
                         ) {
                             RadioButton(selected = theme == t, onClick = null)
                             Text(t.name)
@@ -97,14 +102,17 @@ fun MainMenuScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text("Language", style = MaterialTheme.typography.titleMedium)
+                    Text(context.getString(R.string.settings_language), style = MaterialTheme.typography.titleMedium)
                     AppLanguage.entries.forEach { lang ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().clickable {
-                                onLanguageChange(lang)
-                                showSettings = false
-                            }.padding(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onLanguageChange(lang)
+                                    showSettings = false
+                                }
+                                .padding(8.dp)
                         ) {
                             RadioButton(selected = language == lang, onClick = null)
                             Text(lang.name)
