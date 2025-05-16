@@ -2,10 +2,15 @@ package com.example.semestralka_vamz.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.semestralka_vamz.data.model.GuessState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class GameViewModel : ViewModel() {
 
@@ -23,23 +28,37 @@ class GameViewModel : ViewModel() {
     val _currentGuess = MutableStateFlow(List(4) { 0 })
     val currentGuess: StateFlow<List<Int>> = _currentGuess.asStateFlow()
 
+    private val _elapsedTime = MutableStateFlow(0)
+    val elapsedTime: StateFlow<Int> = _elapsedTime.asStateFlow()
+
+    private var timerJob: Job? = null
+
+    private fun startTimer() {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (isActive) {
+                delay(1000L)
+                _elapsedTime.value += 1
+            }
+        }
+    }
+    fun formatElapsedTime(seconds: Int): String {
+        val hours = seconds / 3600
+        val minutes = (seconds % 3600) / 60
+        val secs = seconds % 60
+
+        return if (hours > 0)
+            String.format("%02d:%02d:%02d", hours, minutes, secs)
+        else
+            String.format("%02d:%02d", minutes, secs)
+    }
+    private fun stopTimer() {
+        timerJob?.cancel()
+    }
+
     fun setGuessAt(index: Int, value: Int) {
         _currentGuess.value = _currentGuess.value.toMutableList().also {
             it[index] = value
-        }
-    }
-
-    fun submitGuess() {
-        if (_gameFinished.value || _currentGuess.value.size != secretCode.size) return
-
-        val current = _currentGuess.value
-        val result = evaluateGuess(secretCode, current)
-
-        _guessHistory.value = _guessHistory.value + result
-        _attemptsUsed.value = _guessHistory.value.size
-
-        if (result.isCorrect || _guessHistory.value.size >= maxAttempts) {
-            _gameFinished.value = true
         }
     }
 
@@ -53,7 +72,24 @@ class GameViewModel : ViewModel() {
         _attemptsUsed.value = 0
         _gameFinished.value = false
         _currentGuess.value = List(secretCode.size) { 0 }
+        _elapsedTime.value = 0
+        startTimer()
         // TODO: regenerate secretCode if needed
+    }
+
+    fun submitGuess() {
+        if (_gameFinished.value || _currentGuess.value.size != secretCode.size) return
+
+        val current = _currentGuess.value
+        val result = evaluateGuess(secretCode, current)
+
+        _guessHistory.value = _guessHistory.value + result
+        _attemptsUsed.value = _guessHistory.value.size
+
+        if (result.isCorrect || _guessHistory.value.size >= maxAttempts) {
+            _gameFinished.value = true
+            stopTimer()
+        }
     }
 
     private fun evaluateGuess(secret: List<Int>, guess: List<Int>): GuessState {

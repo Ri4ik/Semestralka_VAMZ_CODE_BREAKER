@@ -23,9 +23,14 @@ fun GameScreen(
     onBack: () -> Unit = {},
     isDailyChallenge: Boolean = false
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.startNewGame()
+    }
     val guessHistory by viewModel.guessHistory.collectAsState()
     val attemptsUsed by viewModel.attemptsUsed.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
+    val elapsedTime by viewModel.elapsedTime.collectAsState()
+
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -37,12 +42,20 @@ fun GameScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Column {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                }
+                Text(
+                    text = "Time: ${viewModel.formatElapsedTime(elapsedTime)}",
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
-            Text(text = if (isDailyChallenge) stringResource(R.string.menu_daily_challenge) else stringResource(
-                R.string.game
-            )
+            Text(
+                text = if (isDailyChallenge)
+                    stringResource(R.string.menu_daily_challenge)
+                else
+                    stringResource(R.string.game)
             )
             Text(text = "$attemptsUsed / ${viewModel.maxAttempts}")
         }
