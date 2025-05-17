@@ -34,6 +34,11 @@
     <string name="result_entry">Result: %1$s</string>
     <string name="notification_title">Daily Challenge</string>
     <string name="notification_text">It’s time to play your daily challenge!</string>
+    <string name="daily_result_win">You solved the daily challenge!</string>
+    <string name="daily_result_loss">You failed the daily challenge.</string>
+    <string name="daily_attempts">Attempts: %1$d</string>
+    <string name="daily_time">Time: %1$s</string>
+    <string name="next_challenge_in_ui">Next challenge in: %1$s</string>
 
 
 </resources>

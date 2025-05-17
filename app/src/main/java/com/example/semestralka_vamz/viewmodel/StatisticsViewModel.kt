@@ -52,7 +52,7 @@ class StatisticsViewModel(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun formatDateTime(date: LocalDateTime): String {
-        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault())
+        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())
         return date.format(formatter)
     }
 }

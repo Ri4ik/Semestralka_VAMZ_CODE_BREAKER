@@ -10,7 +10,7 @@ import androidx.core.app.NotificationCompat
 import com.example.semestralka_vamz.MainActivity
 import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.data.model.AppLanguage
-import com.example.semestralka_vamz.language.LanguageStorage
+import com.example.semestralka_vamz.store.LanguageStorage
 import com.example.semestralka_vamz.ui.language.createLocalizedContext
 import java.util.Locale
 

@@ -23,7 +23,7 @@ import androidx.work.WorkManager
 import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.data.model.AppLanguage
 import com.example.semestralka_vamz.data.model.AppTheme
-import com.example.semestralka_vamz.language.LanguageStorage
+import com.example.semestralka_vamz.store.LanguageStorage
 import com.example.semestralka_vamz.worker.DailyChallengeWorker
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +75,6 @@ fun MainMenuScreen(
                 onClick = {
                     val request = OneTimeWorkRequestBuilder<DailyChallengeWorker>().build()
                     WorkManager.getInstance(context).enqueue(request)
-                    Log.d("Notification", "Показуємо сповіщення")
                 },
                 modifier = Modifier.fillMaxWidth(0.8f)
             ) {

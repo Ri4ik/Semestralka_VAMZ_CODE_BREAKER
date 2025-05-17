@@ -35,5 +35,10 @@
     <string name="result_entry">Výsledok: %1$s</string>
     <string name="notification_title">Denná výzva</string>
     <string name="notification_text">Je čas zahrať si dennú výzvu!</string>
+    <string name="daily_result_win">Vyriešili ste dennú výzvu!</string>
+    <string name="daily_result_loss">Zlyhal si v dennej výzve.</string>
+    <string name="daily_attempts">Pokusy: %1$d</string>
+    <string name="daily_time">Trvanie: %1$s</string>
+    <string name="next_challenge_in_ui">Ďalšia výzva: %1$s</string>
 
 </resources>

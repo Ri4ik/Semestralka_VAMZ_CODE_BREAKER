@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.semestralka_vamz.data.AppDatabase
 import com.example.semestralka_vamz.data.model.GameStatsEntity
 import com.example.semestralka_vamz.data.model.GuessState
+import com.example.semestralka_vamz.store.DailyChallengeStorage
+import com.example.semestralka_vamz.utils.generateDailyCode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -19,6 +21,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val statsDao = AppDatabase.getInstance(application).gameStatsDao()
 
+    var isDailyChallenge = false
+        private set
+
     private val _guessHistory = MutableStateFlow<List<GuessState>>(emptyList())
     val guessHistory: StateFlow<List<GuessState>> = _guessHistory.asStateFlow()
 
@@ -26,7 +31,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     val gameFinished: StateFlow<Boolean> = _gameFinished.asStateFlow()
 
     val maxAttempts = 8
-    val secretCode = listOf(1, 2, 3, 4) // временно хардкодим
+    var secretCode = listOf(1, 2, 3, 4) // временно хардкодим
     private val _attemptsUsed = MutableStateFlow(0)
     val attemptsUsed: StateFlow<Int> = _attemptsUsed.asStateFlow()
 
@@ -38,6 +43,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private var timerJob: Job? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun startDailyChallenge() {
+        val code = generateDailyCode()
+        isDailyChallenge = true
+        startNewGame(code)
+    }
     private fun startTimer() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -75,7 +86,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun startNewGame() {
+    fun startNewGame(secret: List<Int> = List(4) { 0 }) {
+        secretCode = secret
         _guessHistory.value = emptyList()
         _attemptsUsed.value = 0
         _gameFinished.value = false
@@ -83,6 +95,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _elapsedTime.value = 0
         startTimer()
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun submitGuess() {
@@ -97,6 +110,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (result.isCorrect || _guessHistory.value.size >= maxAttempts) {
             _gameFinished.value = true
             stopTimer()
+            if (isDailyChallenge) {
+                DailyChallengeStorage.saveDailyProgress(
+                    getApplication(),
+                    result.isCorrect,
+                    _attemptsUsed.value,
+                    _elapsedTime.value
+                )
+            }
 
             // 💾 Сохраняем статистику
             val stats = GameStatsEntity(

@@ -1,7 +1,9 @@
 package com.example.semestralka_vamz.ui.screens
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,9 +21,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.semestralka_vamz.viewmodel.GameViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka_vamz.R
+import com.example.semestralka_vamz.store.DailyChallengeStorage
 import com.example.semestralka_vamz.ui.components.DropdownMenuGuess
 import com.example.semestralka_vamz.ui.components.GuessRow
+import java.time.LocalDate
+import com.example.semestralka_vamz.ui.components.DailyChallengeResultDialog
 
+@SuppressLint("StringFormatInvalid")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun GameScreen(
@@ -29,13 +35,46 @@ fun GameScreen(
     onBack: () -> Unit = {},
     isDailyChallenge: Boolean = false
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.startNewGame()
-    }
+    val context = LocalContext.current
     val guessHistory by viewModel.guessHistory.collectAsState()
     val attemptsUsed by viewModel.attemptsUsed.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
     val elapsedTime by viewModel.elapsedTime.collectAsState()
+
+    var showResultDialog by remember { mutableStateOf(false) }
+    var wasWin by remember { mutableStateOf(false) }
+    var savedAttempts by remember { mutableStateOf(0) }
+    var savedTime by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        val (date, solved, stats) = DailyChallengeStorage.loadDailyProgress(context)
+        val today = LocalDate.now()
+
+        if (isDailyChallenge) {
+            if (date == today && solved) {
+                wasWin = true
+                savedAttempts = stats.first
+                savedTime = stats.second
+                showResultDialog = true
+            } else {
+                viewModel.startDailyChallenge()
+            }
+        } else {
+            viewModel.startNewGame()
+        }
+    }
+
+    // Повноекранне повідомлення, якщо денне завдання вже виконано
+    if (isDailyChallenge && showResultDialog) {
+        DailyChallengeResultDialog(
+            isWin = wasWin,
+            attempts = savedAttempts,
+            durationSeconds = savedTime
+        ) {
+            showResultDialog = false
+            onBack()
+        }
+        return
+    }
 
 
     Column(modifier = Modifier
@@ -99,8 +138,10 @@ fun GameScreen(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = { viewModel.startNewGame() }) {
-                Text(stringResource(R.string.restart))
+            if (!isDailyChallenge) {
+                Button(onClick = { viewModel.startNewGame() }) {
+                    Text(stringResource(R.string.restart))
+                }
             }
             Button(
                 onClick = { viewModel.submitGuess() },

@@ -1,4 +1,4 @@
-package com.example.semestralka_vamz.language
+package com.example.semestralka_vamz.store
 
 import android.content.Context
 import com.example.semestralka_vamz.data.model.AppLanguage
