@@ -33,5 +33,7 @@
     <string name="result_win">Výsledok: Výhra</string>
     <string name="result_loss">Výsledok: Prehra</string>
     <string name="result_entry">Výsledok: %1$s</string>
+    <string name="notification_title">Denná výzva</string>
+    <string name="notification_text">Je čas zahrať si dennú výzvu!</string>
 
 </resources>

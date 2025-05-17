@@ -32,5 +32,8 @@
     <string name="result_win">Result: Win</string>
     <string name="result_loss">Result: Loss</string>
     <string name="result_entry">Result: %1$s</string>
+    <string name="notification_title">Daily Challenge</string>
+    <string name="notification_text">It’s time to play your daily challenge!</string>
+
 
 </resources>

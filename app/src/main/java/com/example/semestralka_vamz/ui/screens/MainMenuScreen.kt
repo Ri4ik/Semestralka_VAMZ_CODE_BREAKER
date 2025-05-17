@@ -1,5 +1,6 @@
 package com.example.semestralka_vamz.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -17,9 +18,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.data.model.AppLanguage
 import com.example.semestralka_vamz.data.model.AppTheme
+import com.example.semestralka_vamz.language.LanguageStorage
+import com.example.semestralka_vamz.worker.DailyChallengeWorker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +71,16 @@ fun MainMenuScreen(
             Button(onClick = onStats, modifier = Modifier.fillMaxWidth(0.8f)) {
                 Text(stringResource(id = R.string.menu_statistics))
             }
+            Button(
+                onClick = {
+                    val request = OneTimeWorkRequestBuilder<DailyChallengeWorker>().build()
+                    WorkManager.getInstance(context).enqueue(request)
+                    Log.d("Notification", "Показуємо сповіщення")
+                },
+                modifier = Modifier.fillMaxWidth(0.8f)
+            ) {
+                Text("Test Notification")
+            }
         }
 
         IconButton(
@@ -109,7 +124,8 @@ fun MainMenuScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    onLanguageChange(lang)
+                                    LanguageStorage.saveLanguage(context, lang) // 💾 сохранить в SharedPreferences
+                                    onLanguageChange(lang)                      // обновить ViewModel
                                     showSettings = false
                                 }
                                 .padding(8.dp)

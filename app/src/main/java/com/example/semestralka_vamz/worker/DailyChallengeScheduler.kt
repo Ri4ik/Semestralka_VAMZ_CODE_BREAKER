@@ -1,23 +1,42 @@
 package com.example.semestralka_vamz.worker
 
+
 import android.content.Context
-import androidx.work.*
-import java.util.*
-import java.util.concurrent.TimeUnit
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import java.time.Duration
+import java.util.Calendar
 
-fun scheduleDailyChallenge(context: Context) {
-    val dailyRequest = PeriodicWorkRequestBuilder<DailyChallengeWorker>(
-        1, TimeUnit.DAYS
-    )
-        .setInitialDelay(calculateInitialDelay(), TimeUnit.MILLISECONDS)
-        .build()
+object DailyChallengeScheduler {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun schedule(context: Context) {
+        val request = PeriodicWorkRequestBuilder<DailyChallengeWorker>(
+            Duration.ofMinutes(15) // ⏰ change to Duration.ofDays(1) for daily mode
+        ).build()
 
-    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-        "daily_challenge_work",
-        ExistingPeriodicWorkPolicy.UPDATE,
-        dailyRequest
-    )
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "daily_challenge_work",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+    }
 }
+//fun scheduleDailyChallenge(context: Context) {
+//    val dailyRequest = PeriodicWorkRequestBuilder<DailyChallengeWorker>(
+//        1, TimeUnit.DAYS
+//    )
+//        .setInitialDelay(calculateInitialDelay(), TimeUnit.MILLISECONDS)
+//        .build()
+//
+//    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+//        "daily_challenge_work",
+//        ExistingPeriodicWorkPolicy.UPDATE,
+//        dailyRequest
+//    )
+//}
 
 fun calculateInitialDelay(): Long {
     val now = Calendar.getInstance()
