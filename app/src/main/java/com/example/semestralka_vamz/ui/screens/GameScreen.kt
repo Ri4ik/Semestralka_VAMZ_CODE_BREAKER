@@ -1,5 +1,8 @@
 package com.example.semestralka_vamz.ui.screens
 
+import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,17 +12,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import com.example.semestralka_vamz.viewmodel.GameViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.ui.components.DropdownMenuGuess
 import com.example.semestralka_vamz.ui.components.GuessRow
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun GameScreen(
-    viewModel: GameViewModel = viewModel(),
+    viewModel: GameViewModel = viewModel(factory = ViewModelProvider.AndroidViewModelFactory(LocalContext.current.applicationContext as Application)),
     onBack: () -> Unit = {},
     isDailyChallenge: Boolean = false
 ) {

@@ -1,18 +1,23 @@
 package com.example.semestralka_vamz.viewmodel
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.semestralka_vamz.data.AppDatabase
+import com.example.semestralka_vamz.data.model.GameStatsEntity
 import com.example.semestralka_vamz.data.model.GuessState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
-class GameViewModel : ViewModel() {
+class GameViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val statsDao = AppDatabase.getInstance(application).gameStatsDao()
 
     private val _guessHistory = MutableStateFlow<List<GuessState>>(emptyList())
     val guessHistory: StateFlow<List<GuessState>> = _guessHistory.asStateFlow()
@@ -25,7 +30,7 @@ class GameViewModel : ViewModel() {
     private val _attemptsUsed = MutableStateFlow(0)
     val attemptsUsed: StateFlow<Int> = _attemptsUsed.asStateFlow()
 
-    val _currentGuess = MutableStateFlow(List(4) { 0 })
+    private val _currentGuess = MutableStateFlow(List(4) { 0 })
     val currentGuess: StateFlow<List<Int>> = _currentGuess.asStateFlow()
 
     private val _elapsedTime = MutableStateFlow(0)
@@ -42,6 +47,11 @@ class GameViewModel : ViewModel() {
             }
         }
     }
+
+    private fun stopTimer() {
+        timerJob?.cancel()
+    }
+
     fun formatElapsedTime(seconds: Int): String {
         val hours = seconds / 3600
         val minutes = (seconds % 3600) / 60
@@ -51,9 +61,6 @@ class GameViewModel : ViewModel() {
             String.format("%02d:%02d:%02d", hours, minutes, secs)
         else
             String.format("%02d:%02d", minutes, secs)
-    }
-    private fun stopTimer() {
-        timerJob?.cancel()
     }
 
     fun setGuessAt(index: Int, value: Int) {
@@ -67,6 +74,7 @@ class GameViewModel : ViewModel() {
             if (index in it.indices) it[index] = value
         }
     }
+
     fun startNewGame() {
         _guessHistory.value = emptyList()
         _attemptsUsed.value = 0
@@ -74,9 +82,9 @@ class GameViewModel : ViewModel() {
         _currentGuess.value = List(secretCode.size) { 0 }
         _elapsedTime.value = 0
         startTimer()
-        // TODO: regenerate secretCode if needed
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun submitGuess() {
         if (_gameFinished.value || _currentGuess.value.size != secretCode.size) return
 
@@ -89,6 +97,17 @@ class GameViewModel : ViewModel() {
         if (result.isCorrect || _guessHistory.value.size >= maxAttempts) {
             _gameFinished.value = true
             stopTimer()
+
+            // 💾 Сохраняем статистику
+            val stats = GameStatsEntity(
+                date = LocalDateTime.now(),
+                durationSeconds = _elapsedTime.value.toDouble(),
+                attempts = _attemptsUsed.value,
+                isWin = result.isCorrect
+            )
+            viewModelScope.launch {
+                statsDao.insertGameStats(stats)
+            }
         }
     }
 
@@ -124,6 +143,4 @@ class GameViewModel : ViewModel() {
             partialIndices = partial
         )
     }
-
-
 }

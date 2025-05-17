@@ -5,19 +5,24 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.semestralka_vamz.data.dao.GameResultDao
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.semestralka_vamz.data.dao.GameStatsDao
-import com.example.semestralka_vamz.data.model.GameResult
 import com.example.semestralka_vamz.data.model.GameStatsEntity
 
-@Database(entities = [GameResult::class, GameStatsEntity::class], version = 1)
+@Database(entities = [GameStatsEntity::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun gameStatsDao(): GameStatsDao
-    abstract fun gameResultDao(): GameResultDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // без змін — просто "розмова з Room"
+            }
+        }
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -25,8 +30,11 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "codebreaker.db"
-                ).build().also { INSTANCE = it }
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .build().also { INSTANCE = it }
             }
         }
     }
 }
+

@@ -6,12 +6,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.semestralka_vamz.data.AppDatabase
 import com.example.semestralka_vamz.ui.screens.*
 import com.example.semestralka_vamz.viewmodel.SettingsViewModel
+import com.example.semestralka_vamz.viewmodel.StatisticsViewModel
+import com.example.semestralka_vamz.viewmodel.StatisticsViewModelFactory
 
 @Composable
 fun AppNavGraph(
@@ -49,7 +53,13 @@ fun AppNavGraph(
         }
 
         composable(Routes.STATS) {
-            StatisticsScreen(onBack = { navController.popBackStack() })
+            val context = LocalContext.current
+            val db = AppDatabase.getInstance(context)
+            val dao = db.gameStatsDao()
+            val factory = remember { StatisticsViewModelFactory(dao) }
+            val viewModel: StatisticsViewModel = viewModel(factory = factory)
+
+            StatisticsScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
         }
     }
 }

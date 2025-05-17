@@ -17,7 +17,7 @@ import com.example.semestralka_vamz.viewmodel.StatisticsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsScreen(
-    viewModel: StatisticsViewModel = viewModel(),
+    viewModel: StatisticsViewModel,
     onBack: () -> Unit = {}
 ) {
     val overview by viewModel.overview.collectAsState()
@@ -52,7 +52,7 @@ fun StatisticsScreen(
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Games played: ${overview.gamesPlayed}")
                     Text("Games won: ${overview.gamesWon}")
-                    Text("Avg. attempts: ${overview.avgAttempts}")
+                    Text("Avg. attempts: %.1f".format(overview.avgAttempts))
                     Text("Avg. time: ${overview.avgTime}")
                 }
             }
