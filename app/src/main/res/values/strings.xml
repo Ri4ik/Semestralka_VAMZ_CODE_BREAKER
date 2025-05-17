@@ -19,4 +19,18 @@
     <string name="rules">Rules</string>
     <string name="rules_feedback_checkmark">You guessed the correct code!</string>
 
+    <string name="statistics_title">Statistics</string>
+    <string name="overview">Overview</string>
+    <string name="games_played">Games played</string>
+    <string name="games_won">Games won</string>
+    <string name="avg_attempts">Avg. attempts: %1$.1f</string>
+    <string name="avg_time">Avg. time</string>
+    <string name="date">Date</string>
+    <string name="duration">Duration</string>
+    <string name="attempts">Attempts</string>
+    <string name="result">Result</string>
+    <string name="result_win">Result: Win</string>
+    <string name="result_loss">Result: Loss</string>
+    <string name="result_entry">Result: %1$s</string>
+
 </resources>

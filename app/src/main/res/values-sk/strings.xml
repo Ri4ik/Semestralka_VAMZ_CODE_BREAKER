@@ -19,4 +19,19 @@
     <string name="check_answer">Skontrolovať odpoveď</string>
     <string name="rules">Pravidlá</string>
     <string name="rules_feedback_checkmark">Uhádol si správny kód!</string>
+
+    <string name="statistics_title">Štatistiky</string>
+    <string name="overview">Prehľad</string>
+    <string name="games_played">Počet hier</string>
+    <string name="games_won">Výhier</string>
+    <string name="avg_attempts">Priemerné pokusy: %1$.1f</string>
+    <string name="avg_time">Priemerný čas</string>
+    <string name="date">Dátum</string>
+    <string name="duration">Trvanie</string>
+    <string name="attempts">Pokusy</string>
+    <string name="result">Výsledok</string>
+    <string name="result_win">Výsledok: Výhra</string>
+    <string name="result_loss">Výsledok: Prehra</string>
+    <string name="result_entry">Výsledok: %1$s</string>
+
 </resources>

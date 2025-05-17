@@ -38,7 +38,7 @@ class StatisticsViewModel(
                     date = formatDateTime(it.date),
                     duration = formatDuration(it.durationSeconds),
                     attempts = it.attempts,
-                    result = if (it.isWin) "Win" else "Loss"
+                    isWin = it.isWin
                 )
             }
         }

@@ -1,5 +1,8 @@
 package com.example.semestralka_vamz.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,8 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.viewmodel.StatisticsViewModel
+
+
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsScreen(
@@ -26,7 +32,7 @@ fun StatisticsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("STATISTICS") },
+                title = { Text(stringResource(R.string.statistics_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -41,19 +47,19 @@ fun StatisticsScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text("OVERVIEW", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.overview), style = MaterialTheme.typography.titleMedium)
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Games played: ${overview.gamesPlayed}")
-                    Text("Games won: ${overview.gamesWon}")
-                    Text("Avg. attempts: %.1f".format(overview.avgAttempts))
-                    Text("Avg. time: ${overview.avgTime}")
+                    Text(stringResource(R.string.games_played) + ": ${overview.gamesPlayed}")
+                    Text(stringResource(R.string.games_won) + ": ${overview.gamesWon}")
+                    Text(stringResource(R.string.avg_attempts, overview.avgAttempts))
+                    Text(stringResource(R.string.avg_time) + ": ${overview.avgTime}")
                 }
             }
 
@@ -64,16 +70,18 @@ fun StatisticsScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF2A2A2A)
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
                         Column(Modifier.padding(12.dp)) {
-                            Text("Date: ${entry.date}")
-                            Text("Duration: ${entry.duration}")
-                            Text("Attempts: ${entry.attempts}")
+                            Text(stringResource(R.string.date) + ": ${entry.date}")
+                            Text(stringResource(R.string.duration) + ": ${entry.duration}")
+                            Text(stringResource(R.string.attempts) + ": ${entry.attempts}")
                             Text(
-                                text = "Result: ${entry.result}",
-                                color = if (entry.result == "Win") Color(0xFF4CAF50) else Color(0xFFF44336)
+                                text = stringResource(
+                                    if (entry.isWin) R.string.result_win else R.string.result_loss
+                                ),
+                                color = if (entry.isWin) Color(0xFF4CAF50) else Color(0xFFF44336)
                             )
                         }
                     }
