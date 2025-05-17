@@ -2,6 +2,7 @@ package com.example.semestralka_vamz
 
 import AppLanguageWrapper
 import android.os.Bundle
+import androidx.work.*
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
@@ -11,10 +12,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.semestralka_vamz.navigation.AppNavGraph
 import com.example.semestralka_vamz.ui.theme.AppThemeWrapper
 import com.example.semestralka_vamz.viewmodel.SettingsViewModel
+import com.example.semestralka_vamz.worker.DailyChallengeWorker
+import com.example.semestralka_vamz.worker.scheduleDailyChallenge
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Планування денної задачі
+        scheduleDailyChallenge(applicationContext)
         setContent {
             val settingsViewModel: SettingsViewModel = viewModel()
             val theme by settingsViewModel.theme.collectAsState()
@@ -29,7 +34,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
+
 }
 
 //class MainActivity : ComponentActivity() {
