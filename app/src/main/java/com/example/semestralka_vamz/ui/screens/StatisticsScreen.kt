@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.semestralka_vamz.R
+import com.example.semestralka_vamz.ui.components.GameHistoryList
+import com.example.semestralka_vamz.ui.components.OverviewCard
 import com.example.semestralka_vamz.viewmodel.StatisticsViewModel
 
 
@@ -41,52 +43,35 @@ fun StatisticsScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(stringResource(R.string.overview), style = MaterialTheme.typography.titleMedium)
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.games_played) + ": ${overview.gamesPlayed}")
-                    Text(stringResource(R.string.games_won) + ": ${overview.gamesWon}")
-                    Text(stringResource(R.string.avg_attempts, overview.avgAttempts))
-                    Text(stringResource(R.string.avg_time) + ": ${overview.avgTime}")
+            val isPortrait = this@BoxWithConstraints.maxWidth < 600.dp
+            if (isPortrait) {
+                // Портретна орієнтація
+                Column {
+                    OverviewCard(overview)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    GameHistoryList(history)
                 }
-            }
-
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(history) { entry ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Column(Modifier.padding(12.dp)) {
-                            Text(stringResource(R.string.date) + ": ${entry.date}")
-                            Text(stringResource(R.string.duration) + ": ${entry.duration}")
-                            Text(stringResource(R.string.attempts) + ": ${entry.attempts}")
-                            Text(
-                                text = stringResource(
-                                    if (entry.isWin) R.string.result_win else R.string.result_loss
-                                ),
-                                color = if (entry.isWin) Color(0xFF4CAF50) else Color(0xFFF44336)
-                            )
-                        }
+            } else {
+                // Альбомна орієнтація
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        OverviewCard(overview)
+                    }
+                    Column(modifier = Modifier.weight(2f)) {
+                        GameHistoryList(history)
                     }
                 }
             }
         }
     }
 }
+

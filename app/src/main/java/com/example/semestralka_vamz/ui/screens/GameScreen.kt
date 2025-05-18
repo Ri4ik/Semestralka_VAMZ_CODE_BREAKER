@@ -26,16 +26,19 @@ import com.example.semestralka_vamz.ui.components.DropdownMenuGuess
 import com.example.semestralka_vamz.ui.components.GuessRow
 import java.time.LocalDate
 import com.example.semestralka_vamz.ui.components.DailyChallengeResultDialog
+import com.example.semestralka_vamz.viewmodel.GameViewModelFactory
 
 @SuppressLint("StringFormatInvalid")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun GameScreen(
-    viewModel: GameViewModel = viewModel(factory = ViewModelProvider.AndroidViewModelFactory(LocalContext.current.applicationContext as Application)),
+    navEntry: androidx.navigation.NavBackStackEntry,
+//    viewModel: GameViewModel = viewModel(factory = ViewModelProvider.AndroidViewModelFactory(LocalContext.current.applicationContext as Application)),
     onBack: () -> Unit = {},
     isDailyChallenge: Boolean = false
 ) {
     val context = LocalContext.current
+    val viewModel: GameViewModel = viewModel(navEntry, factory = GameViewModelFactory(context.applicationContext as Application))
     val guessHistory by viewModel.guessHistory.collectAsState()
     val attemptsUsed by viewModel.attemptsUsed.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
@@ -46,6 +49,11 @@ fun GameScreen(
     var savedAttempts by remember { mutableStateOf(0) }
     var savedTime by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
+
+        if (viewModel.isGameStarted) {
+            viewModel.resumeTimerIfNeeded()
+            return@LaunchedEffect
+        }
         val (date, solved, stats) = DailyChallengeStorage.loadDailyProgress(context)
         val today = LocalDate.now()
 
@@ -139,7 +147,7 @@ fun GameScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (!isDailyChallenge) {
-                Button(onClick = { viewModel.startNewGame() }) {
+                Button(onClick = { viewModel.restartGame() }) {
                     Text(stringResource(R.string.restart))
                 }
             }

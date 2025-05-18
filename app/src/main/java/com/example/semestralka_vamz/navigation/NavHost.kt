@@ -1,5 +1,7 @@
 package com.example.semestralka_vamz.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,6 +19,7 @@ import com.example.semestralka_vamz.viewmodel.SettingsViewModel
 import com.example.semestralka_vamz.viewmodel.StatisticsViewModel
 import com.example.semestralka_vamz.viewmodel.StatisticsViewModelFactory
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
@@ -39,12 +42,16 @@ fun AppNavGraph(
             )
         }
 
-        composable(Routes.GAME) {
-            GameScreen(onBack = { navController.popBackStack() }, isDailyChallenge = false)
+        composable(Routes.GAME) { backStackEntry ->
+            GameScreen(
+                navEntry = backStackEntry,
+                onBack = { navController.popBackStack() }, isDailyChallenge = false)
         }
 
-        composable(Routes.DAILY_CHALLENGE) {
-            GameScreen(onBack = { navController.popBackStack() }, isDailyChallenge = true)
+        composable(Routes.DAILY_CHALLENGE) { backStackEntry ->
+            GameScreen(
+                navEntry = backStackEntry,
+                onBack = { navController.popBackStack() }, isDailyChallenge = true)
         }
 
         composable(Routes.RULES) {

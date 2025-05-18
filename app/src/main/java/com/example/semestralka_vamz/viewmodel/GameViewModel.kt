@@ -23,6 +23,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     var isDailyChallenge = false
         private set
+    private var gameStarted = false
+    val isGameStarted: Boolean
+        get() = gameStarted
 
     private val _guessHistory = MutableStateFlow<List<GuessState>>(emptyList())
     val guessHistory: StateFlow<List<GuessState>> = _guessHistory.asStateFlow()
@@ -42,14 +45,18 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     val elapsedTime: StateFlow<Int> = _elapsedTime.asStateFlow()
 
     private var timerJob: Job? = null
+    private var isTimerRunning = false
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun startDailyChallenge() {
+        if (gameStarted) return
         val code = generateDailyCode()
         isDailyChallenge = true
         startNewGame(code)
     }
     private fun startTimer() {
+        if (isTimerRunning) return
+        isTimerRunning = true
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (isActive) {
@@ -60,7 +67,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun stopTimer() {
+        isTimerRunning = false
         timerJob?.cancel()
+    }
+    fun resumeTimerIfNeeded() {
+        if (!_gameFinished.value && !isTimerRunning) {
+            startTimer()
+        }
     }
 
     fun formatElapsedTime(seconds: Int): String {
@@ -87,6 +100,19 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun startNewGame(secret: List<Int> = List(4) { 0 }) {
+        if (gameStarted) return
+        gameStarted = true
+        secretCode = secret
+        _guessHistory.value = emptyList()
+        _attemptsUsed.value = 0
+        _gameFinished.value = false
+        _currentGuess.value = List(secretCode.size) { 0 }
+        _elapsedTime.value = 0
+        startTimer()
+    }
+
+    fun restartGame(secret: List<Int> = List(4) { 0 }) {
+        gameStarted = true
         secretCode = secret
         _guessHistory.value = emptyList()
         _attemptsUsed.value = 0
