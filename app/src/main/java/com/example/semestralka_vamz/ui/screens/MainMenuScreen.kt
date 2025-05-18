@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.semestralka_vamz.BuildConfig
 import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.data.model.AppLanguage
 import com.example.semestralka_vamz.data.model.AppTheme
@@ -51,7 +52,9 @@ fun MainMenuScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
-            modifier = Modifier.fillMaxSize().verticalScroll(scrollState)
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
         ) {
             Text(
                 text = stringResource(R.string.app_name),
@@ -74,15 +77,19 @@ fun MainMenuScreen(
             Button(onClick = onStats, modifier = Modifier.fillMaxWidth(0.8f)) {
                 Text(stringResource(id = R.string.menu_statistics))
             }
-            Button(
-                onClick = {
-                    val request = OneTimeWorkRequestBuilder<DailyChallengeWorker>().build()
-                    WorkManager.getInstance(context).enqueue(request)
-                },
-                modifier = Modifier.fillMaxWidth(0.8f)
-            ) {
-                Text("Test Notification")
+            val isDebug = BuildConfig.DEBUG && (0 != context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)
+            if (isDebug) {
+                Button(
+                    onClick = {
+                        val request = OneTimeWorkRequestBuilder<DailyChallengeWorker>().build()
+                        WorkManager.getInstance(context).enqueue(request)
+                    },
+                    modifier = Modifier.fillMaxWidth(0.8f)
+                ) {
+                    Text(stringResource(R.string.test_notification))
+                }
             }
+
         }
 
         IconButton(
@@ -126,7 +133,10 @@ fun MainMenuScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    LanguageStorage.saveLanguage(context, lang) // 💾 сохранить в SharedPreferences
+                                    LanguageStorage.saveLanguage(
+                                        context,
+                                        lang
+                                    ) // 💾 сохранить в SharedPreferences
                                     onLanguageChange(lang)                      // обновить ViewModel
                                     showSettings = false
                                 }

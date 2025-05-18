@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,21 +13,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import com.example.semestralka_vamz.viewmodel.GameViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka_vamz.R
+import com.example.semestralka_vamz.data.model.AppTheme
 import com.example.semestralka_vamz.store.DailyChallengeStorage
-import com.example.semestralka_vamz.ui.components.DropdownMenuGuess
 import com.example.semestralka_vamz.ui.components.GuessRow
 import java.time.LocalDate
 import com.example.semestralka_vamz.ui.components.DailyChallengeResultDialog
 import com.example.semestralka_vamz.ui.components.GameResultDialog
+import com.example.semestralka_vamz.ui.components.NumberPicker
 import com.example.semestralka_vamz.viewmodel.GameViewModelFactory
 
 @SuppressLint("StringFormatInvalid")
@@ -36,7 +41,8 @@ fun GameScreen(
     navEntry: androidx.navigation.NavBackStackEntry,
 //    viewModel: GameViewModel = viewModel(factory = ViewModelProvider.AndroidViewModelFactory(LocalContext.current.applicationContext as Application)),
     onBack: () -> Unit = {},
-    isDailyChallenge: Boolean = false
+    isDailyChallenge: Boolean = false,
+    theme: AppTheme
 ) {
     val context = LocalContext.current
     val viewModel: GameViewModel = viewModel(navEntry, factory = GameViewModelFactory(context.applicationContext as Application))
@@ -44,6 +50,8 @@ fun GameScreen(
     val attemptsUsed by viewModel.attemptsUsed.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
     val elapsedTime by viewModel.elapsedTime.collectAsState()
+
+    var showResultDialogs by remember { mutableStateOf(false) }
 
     var showResultDialog by remember { mutableStateOf(false) }
     var wasWin by remember { mutableStateOf(false) }
@@ -85,90 +93,117 @@ fun GameScreen(
         return
     }
 
-    // Показываем диалог по окончанию игры
-    if (gameFinished ) {
+//   Показываем диалог по окончанию игры
+    LaunchedEffect(gameFinished) {
+        if (gameFinished) {
+            showResultDialogs = true
+        }
+    }
+    if (showResultDialogs) {
         GameResultDialog(
             isDaylly = isDailyChallenge,
             isWin = guessHistory.lastOrNull()?.isCorrect == true,
             attempts = attemptsUsed,
             durationSeconds = elapsedTime,
-            onPlayAgain = { viewModel.restartGame() },
-            onMainMenu = onBack
+            onPlayAgain = {
+                viewModel.restartGame()
+                showResultDialogs = false
+            },
+            onMainMenu = {
+                showResultDialogs = false
+                onBack()
+            }
         )
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Определяем фон в зависимости от темы
+        val backgroundRes =  if (theme == AppTheme.Dark) R.drawable.background_dark else R.drawable.background_light
+        Image(
+            painter = painterResource(id = backgroundRes),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)) {
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-
-        // Top bar
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            // Top bar
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    if (!isDailyChallenge) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                    Text(
+                        text = stringResource(R.string.daily_time, viewModel.formatElapsedTime(elapsedTime)),
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
                 Text(
-                    text = stringResource(R.string.daily_time, viewModel.formatElapsedTime(elapsedTime)),
-                    style = MaterialTheme.typography.labelMedium
+                    text = if (isDailyChallenge)
+                        stringResource(R.string.menu_daily_challenge)
+                    else
+                        stringResource(R.string.game)
                 )
+                Text(text = "$attemptsUsed / ${viewModel.maxAttempts}")
             }
-            Text(
-                text = if (isDailyChallenge)
-                    stringResource(R.string.menu_daily_challenge)
-                else
-                    stringResource(R.string.game)
-            )
-            Text(text = "$attemptsUsed / ${viewModel.maxAttempts}")
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // LazyColumn – pokusy
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(guessHistory) { guess ->
-                GuessRow(guess)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Створюємо нову змінну — активний масив з ViewModel
-        val currentGuess by viewModel.currentGuess.collectAsState()
-        // Aktívny pokus – výber 4 čísel
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(4) { index ->
-                DropdownMenuGuess(
-                    selected = currentGuess.getOrElse(index) { 0 },
-                    onSelect = { viewModel.setGuessAt(index, it) }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Ovládacie tlačidlá
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            if (!isDailyChallenge) {
-                Button(onClick = { viewModel.restartGame() }) {
-                    Text(stringResource(R.string.restart))
+            // LazyColumn – pokusy
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(guessHistory) { guess ->
+                    GuessRow(guess)
                 }
             }
-            Button(
-                onClick = { viewModel.submitGuess() },
-                enabled = !gameFinished
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Створюємо нову змінну — активний масив з ViewModel
+            val currentGuess by viewModel.currentGuess.collectAsState()
+            // Aktívny pokus – výber 4 čísel
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text(stringResource(R.string.check_answer))
+                repeat(4) { index ->
+                    NumberPicker(
+                        selected = currentGuess.getOrElse(index) { 0 },
+                        onSelect = { viewModel.setGuessAt(index, it) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Ovládacie tlačidlá
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                if (!isDailyChallenge) {
+                    Button(onClick = { viewModel.restartGame() }) {
+                        Text(stringResource(R.string.restart))
+                    }
+                } else {
+                    Spacer(modifier = Modifier.width(1.dp))
+                }
+                Button(
+                    onClick = { viewModel.submitGuess() },
+                    enabled = !gameFinished
+                ) {
+                    Text(stringResource(R.string.check_answer))
+                }
             }
         }
     }

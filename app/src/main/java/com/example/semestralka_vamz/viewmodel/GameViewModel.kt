@@ -108,16 +108,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         return List(4) { random.nextInt(0, 10) }
     }
 
+
     fun startNewGame(secret: List<Int> = generateCode()) {
         if (gameStarted) return
-        gameStarted = true
-        secretCode = secret
-        _guessHistory.value = emptyList()
-        _attemptsUsed.value = 0
-        _gameFinished.value = false
-        _currentGuess.value = List(secretCode.size) { 0 }
-        _elapsedTime.value = 0
-        startTimer()
+        restartGame(secret)
     }
 
     fun restartGame(secret: List<Int> = generateCode()) {

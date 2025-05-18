@@ -48,5 +48,6 @@
     <string name="result_win_end">Gratulujem, vyhrali ste!</string>
     <string name="result_loss_end">Porážka</string>
     <string name="result_loss_daylly">Neuspel si v dennej výzve</string>
+    <string name="test_notification">Testovanie Oznámení</string>
 
 </resources>

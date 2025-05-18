@@ -57,7 +57,8 @@ object NotificationHelper {
     private fun showBaseNotification(
         context: Context,
         titleRes: Int,
-        textRes: Int,
+        textRes: Int? = null,
+        text: String? = null,
         notificationId: Int = NOTIFICATION_ID
     ) {
         val localizedContext = context.createLocalizedContextWithStorage()
@@ -82,48 +83,10 @@ object NotificationHelper {
             manager.createNotificationChannel(channel)
         }
 
+        val notificationText = text ?: localizedContext.getString(textRes!!)
         val notification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
             .setContentTitle(localizedContext.getString(titleRes))
-            .setContentText(localizedContext.getString(textRes))
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-
-        manager.notify(notificationId, notification)
-    }
-
-    private fun showBaseNotification(
-        context: Context,
-        titleRes: Int,
-        text: String,
-        notificationId: Int = NOTIFICATION_ID
-    ) {
-        val localizedContext = context.createLocalizedContextWithStorage()
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val intent = Intent(context, MainActivity::class.java).apply {
-            putExtra("navigateTo", "daily_challenge")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-            context, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                localizedContext.getString(R.string.notification_title),
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            manager.createNotificationChannel(channel)
-        }
-
-        val notification = NotificationCompat.Builder(localizedContext, CHANNEL_ID)
-            .setContentTitle(localizedContext.getString(titleRes))
-            .setContentText(text)
+            .setContentText(notificationText)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

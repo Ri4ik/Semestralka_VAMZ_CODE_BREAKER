@@ -43,15 +43,21 @@ fun AppNavGraph(
         }
 
         composable(Routes.GAME) { backStackEntry ->
+            val theme by settingsViewModel.theme.collectAsState()
             GameScreen(
                 navEntry = backStackEntry,
-                onBack = { navController.popBackStack() }, isDailyChallenge = false)
+                onBack = { navController.popBackStack() },
+                isDailyChallenge = false,
+                theme = theme)
         }
 
         composable(Routes.DAILY_CHALLENGE) { backStackEntry ->
+            val theme by settingsViewModel.theme.collectAsState()
             GameScreen(
                 navEntry = backStackEntry,
-                onBack = { navController.popBackStack() }, isDailyChallenge = true)
+                onBack = { navController.popBackStack() },
+                isDailyChallenge = true,
+                theme = theme)
         }
 
         composable(Routes.RULES) {
