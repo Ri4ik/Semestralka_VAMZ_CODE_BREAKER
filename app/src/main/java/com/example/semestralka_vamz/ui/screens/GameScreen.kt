@@ -26,6 +26,7 @@ import com.example.semestralka_vamz.ui.components.DropdownMenuGuess
 import com.example.semestralka_vamz.ui.components.GuessRow
 import java.time.LocalDate
 import com.example.semestralka_vamz.ui.components.DailyChallengeResultDialog
+import com.example.semestralka_vamz.ui.components.GameResultDialog
 import com.example.semestralka_vamz.viewmodel.GameViewModelFactory
 
 @SuppressLint("StringFormatInvalid")
@@ -84,6 +85,18 @@ fun GameScreen(
         return
     }
 
+    // Показываем диалог по окончанию игры
+    if (gameFinished ) {
+        GameResultDialog(
+            isDaylly = isDailyChallenge,
+            isWin = guessHistory.lastOrNull()?.isCorrect == true,
+            attempts = attemptsUsed,
+            durationSeconds = elapsedTime,
+            onPlayAgain = { viewModel.restartGame() },
+            onMainMenu = onBack
+        )
+    }
+
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -100,7 +113,7 @@ fun GameScreen(
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                 }
                 Text(
-                    text = "Time: ${viewModel.formatElapsedTime(elapsedTime)}",
+                    text = stringResource(R.string.daily_time, viewModel.formatElapsedTime(elapsedTime)),
                     style = MaterialTheme.typography.labelMedium
                 )
             }

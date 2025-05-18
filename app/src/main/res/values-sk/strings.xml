@@ -43,6 +43,7 @@
 
     <string name="win_notification_text">Vyhral si dnešnú výzvu za %1$d pokusy!</string>
     <string name="lose_notification_text">Skús to znova zajtra!</string>
-
+    <string name="menu_main">Hlavné menu</string>
+    <string name="try_againe">Hrať znova</string>
 
 </resources>
