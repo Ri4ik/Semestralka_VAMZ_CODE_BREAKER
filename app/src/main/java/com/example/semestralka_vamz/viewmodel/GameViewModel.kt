@@ -9,13 +9,14 @@ import com.example.semestralka_vamz.data.AppDatabase
 import com.example.semestralka_vamz.data.model.GameStatsEntity
 import com.example.semestralka_vamz.data.model.GuessState
 import com.example.semestralka_vamz.store.DailyChallengeStorage
-import com.example.semestralka_vamz.utils.generateDailyCode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -34,7 +35,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     val gameFinished: StateFlow<Boolean> = _gameFinished.asStateFlow()
 
     val maxAttempts = 8
-    var secretCode = listOf(1, 2, 3, 4) // временно хардкодим
+    var secretCode = listOf(1, 2, 3, 4)
     private val _attemptsUsed = MutableStateFlow(0)
     val attemptsUsed: StateFlow<Int> = _attemptsUsed.asStateFlow()
 
@@ -93,13 +94,20 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateGuess(index: Int, value: Int) {
-        _currentGuess.value = _currentGuess.value.toMutableList().also {
-            if (index in it.indices) it[index] = value
-        }
+    private fun generateCode(): List<Int> {
+        val random = Random(System.currentTimeMillis())
+        return List(4) { random.nextInt(0, 10) }
     }
 
-    fun startNewGame(secret: List<Int> = List(4) { 0 }) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun generateDailyCode(): List<Int> {
+        val today = LocalDate.now()
+        val seed = today.toEpochDay()
+        val random = Random(seed)
+        return List(4) { random.nextInt(0, 10) }
+    }
+
+    fun startNewGame(secret: List<Int> = generateCode()) {
         if (gameStarted) return
         gameStarted = true
         secretCode = secret
@@ -111,7 +119,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         startTimer()
     }
 
-    fun restartGame(secret: List<Int> = List(4) { 0 }) {
+    fun restartGame(secret: List<Int> = generateCode()) {
         gameStarted = true
         secretCode = secret
         _guessHistory.value = emptyList()
