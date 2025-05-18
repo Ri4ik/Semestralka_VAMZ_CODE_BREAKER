@@ -1,13 +1,9 @@
 package com.example.semestralka_vamz.navigation
 
+// Importy pre Compose navigáciu, ViewModel, a obrazovky
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -19,14 +15,17 @@ import com.example.semestralka_vamz.viewmodel.SettingsViewModel
 import com.example.semestralka_vamz.viewmodel.StatisticsViewModel
 import com.example.semestralka_vamz.viewmodel.StatisticsViewModelFactory
 
-@RequiresApi(Build.VERSION_CODES.O)
+// Navigačný graf aplikácie – definuje všetky obrazovky a ich trasy
+@RequiresApi(Build.VERSION_CODES.O) // niektoré obrazovky používajú LocalDateTime (od Android 8.0)
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel // zdieľaný ViewModel pre tému a jazyk
 ) {
+    // Definícia navigačného stromu, s počiatočnou obrazovkou MAIN_MENU
     NavHost(navController = navController, startDestination = Routes.MAIN_MENU) {
 
+        // Hlavné menu
         composable(Routes.MAIN_MENU) {
             val theme by settingsViewModel.theme.collectAsState()
             val language by settingsViewModel.language.collectAsState()
@@ -42,29 +41,35 @@ fun AppNavGraph(
             )
         }
 
+        // Klasická hra
         composable(Routes.GAME) { backStackEntry ->
             val theme by settingsViewModel.theme.collectAsState()
             GameScreen(
                 navEntry = backStackEntry,
                 onBack = { navController.popBackStack() },
                 isDailyChallenge = false,
-                theme = theme)
+                theme = theme
+            )
         }
 
+        // Denná výzva
         composable(Routes.DAILY_CHALLENGE) { backStackEntry ->
             val theme by settingsViewModel.theme.collectAsState()
             GameScreen(
                 navEntry = backStackEntry,
                 onBack = { navController.popBackStack() },
                 isDailyChallenge = true,
-                theme = theme)
+                theme = theme
+            )
         }
 
+        // Obrazovka s pravidlami
         composable(Routes.RULES) {
             val theme by settingsViewModel.theme.collectAsState()
             RulesScreen(onBack = { navController.popBackStack() }, theme = theme)
         }
 
+        // Obrazovka so štatistikami
         composable(Routes.STATS) {
             val context = LocalContext.current
             val db = AppDatabase.getInstance(context)

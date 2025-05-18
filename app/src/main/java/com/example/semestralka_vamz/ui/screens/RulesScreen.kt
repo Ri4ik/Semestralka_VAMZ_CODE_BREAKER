@@ -1,5 +1,6 @@
 package com.example.semestralka_vamz.ui.screens
 
+// Importy potrebné pre rozloženie, ikony, štýly a zobrazenie obrázka
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,9 +24,10 @@ import com.example.semestralka_vamz.data.model.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RulesScreen(
-    onBack: () -> Unit = {},
-    theme: AppTheme
+    onBack: () -> Unit = {}, // Callback na návrat späť
+    theme: AppTheme          // Aktuálna téma (tmavá / svetlá)
 ) {
+    // Scaffold zabezpečuje základné rozloženie obrazovky s TopAppBar
     Scaffold(
         topBar = {
             TopAppBar(
@@ -38,6 +40,7 @@ fun RulesScreen(
             )
         }
     ) { innerPadding ->
+        // Hlavný obsah obrazovky, scrollovateľný stĺpec
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -45,17 +48,23 @@ fun RulesScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Nadpis sekcie pravidiel
             Text(
                 text = stringResource(R.string.rules_guess_code),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
+
+            // Vysvetlenie základného princípu spätnej väzby
             Text(stringResource(R.string.rules_feedback_info))
 
+            // Popis farebného kódu spätnej väzby
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = stringResource(R.string.rules_feedback_green), fontSize = 16.sp)
                 Text(text = stringResource(R.string.rules_feedback_yellow), fontSize = 16.sp)
                 Text(text = stringResource(R.string.rules_feedback_blue), fontSize = 16.sp)
+
+                // Ikona označujúca úspešné uhádnutie
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -73,23 +82,26 @@ fun RulesScreen(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+
+            // Obrázok pravidiel, mení sa podľa aktuálnej témy
             val imageRes = when (theme) {
                 AppTheme.Dark -> R.drawable.rules_dark
                 AppTheme.Light -> R.drawable.rules_light
             }
             Image(
-                painter =painterResource(imageRes),
+                painter = painterResource(imageRes),
                 contentDescription = "Pravidlá ilustrácia",
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Tlačidlo OK na zatvorenie obrazovky
             Button(
                 onClick = onBack,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         }
     }

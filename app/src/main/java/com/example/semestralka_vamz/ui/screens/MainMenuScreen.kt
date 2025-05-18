@@ -1,5 +1,6 @@
 package com.example.semestralka_vamz.ui.screens
 
+// Importy pre komponenty, layout, stav a spracovanie práce (WorkManager)
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,11 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,23 +29,27 @@ import com.example.semestralka_vamz.worker.DailyChallengeWorker
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainMenuScreen(
-    onNewGame: () -> Unit = {},
-    onDailyChallenge: () -> Unit = {},
-    onRules: () -> Unit = {},
-    onStats: () -> Unit = {},
-    theme: AppTheme,
-    onThemeChange: (AppTheme) -> Unit = {},
-    language: AppLanguage,
-    onLanguageChange: (AppLanguage) -> Unit = {}
+    onNewGame: () -> Unit = {},                 // Callback na začatie novej hry
+    onDailyChallenge: () -> Unit = {},         // Callback na dennú výzvu
+    onRules: () -> Unit = {},                  // Callback na zobrazenie pravidiel
+    onStats: () -> Unit = {},                  // Callback na štatistiky
+    theme: AppTheme,                           // Aktuálne zvolená téma
+    onThemeChange: (AppTheme) -> Unit = {},    // Callback na zmenu témy
+    language: AppLanguage,                     // Aktuálne zvolený jazyk
+    onLanguageChange: (AppLanguage) -> Unit = {} // Callback na zmenu jazyka
 ) {
-    var showSettings by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) } // Otvorený spodný panel s nastaveniami
     val context = LocalContext.current
+
+    // Hlavný kontajner obrazovky
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp)
     ) {
         val scrollState = rememberScrollState()
+
+        // Vertikálne menu s tlačidlami
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
@@ -56,42 +57,47 @@ fun MainMenuScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
+            // Názov aplikácie
             Text(
                 text = stringResource(R.string.app_name),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold
             )
 
+            // Tlačidlo: Nová hra
             Button(onClick = onNewGame, modifier = Modifier.fillMaxWidth(0.8f)) {
                 Text(stringResource(id = R.string.menu_new_game))
             }
 
+            // Tlačidlo: Denná výzva
             Button(onClick = onDailyChallenge, modifier = Modifier.fillMaxWidth(0.8f)) {
                 Text(stringResource(id = R.string.menu_daily_challenge))
             }
 
+            // Tlačidlo: Pravidlá
             Button(onClick = onRules, modifier = Modifier.fillMaxWidth(0.8f)) {
                 Text(stringResource(id = R.string.menu_rules))
             }
 
+            // Tlačidlo: Štatistiky
             Button(onClick = onStats, modifier = Modifier.fillMaxWidth(0.8f)) {
                 Text(stringResource(id = R.string.menu_statistics))
             }
-            val isDebug = BuildConfig.DEBUG && (0 != context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)
-            if (isDebug) {
-                Button(
-                    onClick = {
-                        val request = OneTimeWorkRequestBuilder<DailyChallengeWorker>().build()
-                        WorkManager.getInstance(context).enqueue(request)
-                    },
-                    modifier = Modifier.fillMaxWidth(0.8f)
-                ) {
-                    Text(stringResource(R.string.test_notification))
-                }
-            }
 
+            // Tlačidlo len pre debug mód – testovacia notifikácia
+//                Button(
+//                    onClick = {
+//                        val request = OneTimeWorkRequestBuilder<DailyChallengeWorker>().build()
+//                        WorkManager.getInstance(context).enqueue(request)
+//                    },
+//                    modifier = Modifier.fillMaxWidth(0.8f)
+//                ) {
+//                    Text(stringResource(R.string.test_notification))
+//                }
+//            }
         }
 
+        //  Tlačidlo na otvorenie nastavení (pravý dolný roh)
         IconButton(
             onClick = { showSettings = true },
             modifier = Modifier
@@ -101,12 +107,14 @@ fun MainMenuScreen(
             Icon(Icons.Default.Settings, contentDescription = "Change settings")
         }
 
+        //  Spodný panel s nastaveniami (téma + jazyk)
         if (showSettings) {
             ModalBottomSheet(onDismissRequest = { showSettings = false }) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Sekcia: Téma aplikácie
                     Text(context.getString(R.string.settings_theme), style = MaterialTheme.typography.titleMedium)
                     AppTheme.entries.forEach { t ->
                         Row(
@@ -114,7 +122,7 @@ fun MainMenuScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    onThemeChange(t)
+                                    onThemeChange(t)  // zmena témy
                                     showSettings = false
                                 }
                                 .padding(8.dp)
@@ -126,6 +134,7 @@ fun MainMenuScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Sekcia: Jazyk aplikácie
                     Text(context.getString(R.string.settings_language), style = MaterialTheme.typography.titleMedium)
                     AppLanguage.entries.forEach { lang ->
                         Row(
@@ -133,11 +142,8 @@ fun MainMenuScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    LanguageStorage.saveLanguage(
-                                        context,
-                                        lang
-                                    ) // 💾 сохранить в SharedPreferences
-                                    onLanguageChange(lang)                      // обновить ViewModel
+                                    LanguageStorage.saveLanguage(context, lang) // uloženie do SharedPreferences
+                                    onLanguageChange(lang)                      // aktualizácia v nastaveniach
                                     showSettings = false
                                 }
                                 .padding(8.dp)

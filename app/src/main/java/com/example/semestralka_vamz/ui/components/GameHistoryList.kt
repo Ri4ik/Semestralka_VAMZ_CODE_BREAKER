@@ -1,5 +1,6 @@
 package com.example.semestralka_vamz.ui.components
 
+// Importy pre layout, štýly, zobrazenie zoznamu a lokalizáciu
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.semestralka_vamz.R
 import androidx.compose.foundation.lazy.items
 
+// Komponent, ktorý zobrazuje zoznam histórie hier pomocou LazyColumn
 @Composable
 fun GameHistoryList(history: List<com.example.semestralka_vamz.data.model.GameHistoryEntry>) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -26,18 +28,22 @@ fun GameHistoryList(history: List<com.example.semestralka_vamz.data.model.GameHi
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(Modifier.padding(12.dp)) {
+                    // Zobrazenie dátumu hry
                     Text(stringResource(R.string.date) + ": ${entry.date}")
+                    // Trvanie hry
                     Text(stringResource(R.string.duration) + ": ${entry.duration}")
+                    // Počet pokusov
                     Text(stringResource(R.string.attempts) + ": ${entry.attempts}")
+                    // Výsledok hry (výhra/prehra) s farebným zvýraznením
                     Text(
                         text = stringResource(
                             if (entry.isWin) R.string.result_win else R.string.result_loss
                         ),
                         color = if (entry.isWin) Color(0xFF4CAF50) else Color(0xFFF44336)
+                        // Zelená = výhra, červená = prehra
                     )
                 }
             }
         }
     }
 }
-

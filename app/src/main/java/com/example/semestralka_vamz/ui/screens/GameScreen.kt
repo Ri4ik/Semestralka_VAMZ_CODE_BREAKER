@@ -1,9 +1,9 @@
 package com.example.semestralka_vamz.ui.screens
 
+// Importy základných komponentov Compose a ViewModel
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -21,54 +20,54 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import com.example.semestralka_vamz.viewmodel.GameViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.semestralka_vamz.R
 import com.example.semestralka_vamz.data.model.AppTheme
 import com.example.semestralka_vamz.store.DailyChallengeStorage
-import com.example.semestralka_vamz.ui.components.GuessRow
-import java.time.LocalDate
-import com.example.semestralka_vamz.ui.components.DailyChallengeResultDialog
-import com.example.semestralka_vamz.ui.components.GameResultDialog
-import com.example.semestralka_vamz.ui.components.NumberPicker
+import com.example.semestralka_vamz.ui.components.*
 import com.example.semestralka_vamz.viewmodel.GameViewModelFactory
+import java.time.LocalDate
 
 @SuppressLint("StringFormatInvalid")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun GameScreen(
     navEntry: androidx.navigation.NavBackStackEntry,
-//    viewModel: GameViewModel = viewModel(factory = ViewModelProvider.AndroidViewModelFactory(LocalContext.current.applicationContext as Application)),
     onBack: () -> Unit = {},
     isDailyChallenge: Boolean = false,
     theme: AppTheme
 ) {
+    // Inicializácia ViewModelu
     val context = LocalContext.current
     val viewModel: GameViewModel = viewModel(navEntry, factory = GameViewModelFactory(context.applicationContext as Application))
+
+    // Získavame stavy z ViewModelu
     val guessHistory by viewModel.guessHistory.collectAsState()
     val attemptsUsed by viewModel.attemptsUsed.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
     val elapsedTime by viewModel.elapsedTime.collectAsState()
 
+    // Príznaky pre dialógy
     var showResultDialogs by remember { mutableStateOf(false) }
-
     var showResultDialog by remember { mutableStateOf(false) }
     var wasWin by remember { mutableStateOf(false) }
     var savedAttempts by remember { mutableStateOf(0) }
     var savedTime by remember { mutableStateOf(0) }
-    LaunchedEffect(Unit) {
 
+    // Načítanie a inicializácia hry
+    LaunchedEffect(Unit) {
         if (viewModel.isGameStarted) {
             viewModel.resumeTimerIfNeeded()
             return@LaunchedEffect
         }
+
         val (date, solved, stats) = DailyChallengeStorage.loadDailyProgress(context)
         val today = LocalDate.now()
 
         if (isDailyChallenge) {
-            if (date == today ) { //&& solved
-                wasWin = solved //true
+            if (date == today) {
+                wasWin = solved
                 savedAttempts = stats.first
                 savedTime = stats.second
                 showResultDialog = true
@@ -80,7 +79,7 @@ fun GameScreen(
         }
     }
 
-    // Повноекранне повідомлення, якщо денне завдання вже виконано
+    // Zobrazenie výsledku dennej výzvy
     if (isDailyChallenge && showResultDialog) {
         DailyChallengeResultDialog(
             isWin = wasWin,
@@ -93,7 +92,7 @@ fun GameScreen(
         return
     }
 
-//   Показываем диалог по окончанию игры
+    // Zobrazenie bežného výsledku po skončení hry
     LaunchedEffect(gameFinished) {
         if (gameFinished) {
             showResultDialogs = true
@@ -116,20 +115,107 @@ fun GameScreen(
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Определяем фон в зависимости от темы
-        val backgroundRes =  if (theme == AppTheme.Dark) R.drawable.background_dark else R.drawable.background_light
+    // Detekcia orientácie obrazovky
+    val configuration = LocalContext.current.resources.configuration
+    val isPortrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+
+    // Hlavný kontajner s pozadím podľa témy
+    Box(modifier = Modifier.fillMaxSize().padding(0.dp)) {
+        val backgroundRes = if (theme == AppTheme.Dark) R.drawable.background_dark else R.drawable.background_light
         Image(
             painter = painterResource(id = backgroundRes),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)) {
 
-            // Top bar
+        // Portrétna orientácia
+        if (isPortrait) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Horný panel
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        if (!isDailyChallenge) {
+                            IconButton(onClick = onBack) {
+                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            }
+                        }
+                        Text(
+                            text = stringResource(R.string.daily_time, viewModel.formatElapsedTime(elapsedTime)),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                    Text(
+                        text = if (isDailyChallenge)
+                            stringResource(R.string.menu_daily_challenge)
+                        else
+                            stringResource(R.string.game)
+                    )
+                    Text(text = "$attemptsUsed / ${viewModel.maxAttempts}")
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Zoznam pokusov
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(guessHistory) { guess ->
+                        GuessRow(guess)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Aktuálny pokus – výber čísel cez NumberPicker
+                val currentGuess by viewModel.currentGuess.collectAsState()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    repeat(4) { index ->
+                        NumberPicker(
+                            selected = currentGuess.getOrElse(index) { 0 },
+                            onSelect = { viewModel.setGuessAt(index, it) },
+                            modifier = Modifier.width(64.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Ovládacie tlačidlá
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    if (!isDailyChallenge) {
+                        Button(onClick = { viewModel.restartGame() }) {
+                            Text(stringResource(R.string.restart))
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(1.dp))
+                    }
+                    Button(
+                        onClick = { viewModel.submitGuess() },
+                        enabled = !gameFinished
+                    ) {
+                        Text(stringResource(R.string.check_answer))
+                    }
+                }
+            }
+
+        } else {
+            // Krajinná orientácia
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -141,68 +227,79 @@ fun GameScreen(
                             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                         }
                     }
-                    Text(
-                        text = stringResource(R.string.daily_time, viewModel.formatElapsedTime(elapsedTime)),
-                        style = MaterialTheme.typography.labelMedium
-                    )
                 }
                 Text(
                     text = if (isDailyChallenge)
                         stringResource(R.string.menu_daily_challenge)
                     else
-                        stringResource(R.string.game)
+                        stringResource(R.string.game) + "   " +
+                                stringResource(R.string.daily_time, viewModel.formatElapsedTime(elapsedTime)),
+                    style = MaterialTheme.typography.labelMedium
                 )
                 Text(text = "$attemptsUsed / ${viewModel.maxAttempts}")
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
-            // LazyColumn – pokusy
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(guessHistory) { guess ->
-                    GuessRow(guess)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Створюємо нову змінну — активний масив з ViewModel
-            val currentGuess by viewModel.currentGuess.collectAsState()
-            // Aktívny pokus – výber 4 čísel
+            // Hlavný obsah – rozdelený na 2 stĺpce
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                repeat(4) { index ->
-                    NumberPicker(
-                        selected = currentGuess.getOrElse(index) { 0 },
-                        onSelect = { viewModel.setGuessAt(index, it) }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Ovládacie tlačidlá
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                if (!isDailyChallenge) {
-                    Button(onClick = { viewModel.restartGame() }) {
-                        Text(stringResource(R.string.restart))
-                    }
-                } else {
-                    Spacer(modifier = Modifier.width(1.dp))
-                }
-                Button(
-                    onClick = { viewModel.submitGuess() },
-                    enabled = !gameFinished
+                // Ľavý stĺpec: história pokusov
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(start = 40.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(stringResource(R.string.check_answer))
+                    items(guessHistory) { guess ->
+                        GuessRow(guess)
+                    }
+                }
+
+                // Pravý stĺpec: NumberPicker + tlačidlá
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val currentGuess by viewModel.currentGuess.collectAsState()
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        repeat(4) { index ->
+                            NumberPicker(
+                                selected = currentGuess.getOrElse(index) { 0 },
+                                onSelect = { viewModel.setGuessAt(index, it) },
+                                modifier = Modifier.width(64.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        if (!isDailyChallenge) {
+                            Button(onClick = { viewModel.restartGame() }) {
+                                Text(stringResource(R.string.restart))
+                            }
+                        }
+                        Button(
+                            onClick = { viewModel.submitGuess() },
+                            enabled = !gameFinished
+                        ) {
+                            Text(stringResource(R.string.check_answer))
+                        }
+                    }
                 }
             }
         }
