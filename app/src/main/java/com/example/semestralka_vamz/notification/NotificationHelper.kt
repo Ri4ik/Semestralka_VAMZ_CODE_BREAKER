@@ -39,7 +39,7 @@ object NotificationHelper {
 
         showBaseNotification(
             context = context,
-            titleRes = R.string.result_win,
+            titleRes = R.string.result_win_end,
             text = text,
             notificationId = RESULT_NOTIFICATION_ID
         )
@@ -48,7 +48,7 @@ object NotificationHelper {
     fun showLoseNotification(context: Context) {
         showBaseNotification(
             context = context,
-            titleRes = R.string.result_loss,
+            titleRes = R.string.result_loss_daylly,
             textRes = R.string.lose_notification_text,
             notificationId = RESULT_NOTIFICATION_ID
         )

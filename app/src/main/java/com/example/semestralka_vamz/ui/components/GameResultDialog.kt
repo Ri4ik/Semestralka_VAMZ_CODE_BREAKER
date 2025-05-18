@@ -20,9 +20,9 @@ fun GameResultDialog(
     val context = LocalContext.current
 
     val title = if (isWin) {
-        context.getString(R.string.result_win)
+        context.getString(R.string.result_win_end)
     } else {
-        context.getString(R.string.result_loss)
+        context.getString(R.string.result_loss_end)
     }
 
     val time = formatElapsedTime(durationSeconds)

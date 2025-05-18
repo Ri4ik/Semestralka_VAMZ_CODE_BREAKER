@@ -44,6 +44,10 @@
     <string name="lose_notification_text">Try again tomorrow!</string>
     <string name="menu_main">Main menu</string>
     <string name="try_againe">Play again</string>
+    <string name="result_win_end">Congratulations, you won!</string>
+    <string name="result_loss_end">Defeat</string>
+    <string name="result_loss_daylly">You failed the daily challenge</string>
+
 
 
 </resources>

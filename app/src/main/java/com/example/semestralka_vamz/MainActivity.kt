@@ -17,6 +17,7 @@ import com.example.semestralka_vamz.ui.theme.AppThemeWrapper
 import com.example.semestralka_vamz.viewmodel.SettingsViewModel
 import com.example.semestralka_vamz.viewmodel.SettingsViewModelFactory
 import com.example.semestralka_vamz.worker.DailyChallengeScheduler
+import androidx.core.content.edit
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -29,8 +30,13 @@ class MainActivity : ComponentActivity() {
             "daily_challenge" -> "daily_challenge"
             else -> "main_menu"
         }
-//        val initialLanguage = LanguageStorage.loadLanguage(applicationContext)
-        DailyChallengeScheduler.schedule(applicationContext)
+//       SharedPreferences, aby sa schedule() volal iba raz počas životnosti aplikácie
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+        val hasScheduled = prefs.getBoolean("has_scheduled", false)
+        if (!hasScheduled) {
+            DailyChallengeScheduler.schedule(applicationContext)
+            prefs.edit() { putBoolean("has_scheduled", true) }
+        }
         setContent {
             val settingsViewModel: SettingsViewModel = viewModel( factory = SettingsViewModelFactory(applicationContext))
             val language by settingsViewModel.language.collectAsState()

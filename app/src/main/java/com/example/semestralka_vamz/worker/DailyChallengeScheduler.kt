@@ -13,7 +13,7 @@ object DailyChallengeScheduler {
     @RequiresApi(Build.VERSION_CODES.O)
     fun schedule(context: Context) {
         val request = PeriodicWorkRequestBuilder<DailyChallengeWorker>(
-            Duration.ofDays(1) // ⏰ change to Duration.ofDays(1) for daily mode
+            Duration.ofDays(1)
         ).build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(

@@ -45,5 +45,8 @@
     <string name="lose_notification_text">Skús to znova zajtra!</string>
     <string name="menu_main">Hlavné menu</string>
     <string name="try_againe">Hrať znova</string>
+    <string name="result_win_end">Gratulujem, vyhrali ste!</string>
+    <string name="result_loss_end">Porážka</string>
+    <string name="result_loss_daylly">Neuspel si v dennej výzve</string>
 
 </resources>

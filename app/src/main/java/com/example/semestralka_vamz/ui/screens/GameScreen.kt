@@ -59,8 +59,8 @@ fun GameScreen(
         val today = LocalDate.now()
 
         if (isDailyChallenge) {
-            if (date == today && solved) {
-                wasWin = true
+            if (date == today ) { //&& solved
+                wasWin = solved //true
                 savedAttempts = stats.first
                 savedTime = stats.second
                 showResultDialog = true
