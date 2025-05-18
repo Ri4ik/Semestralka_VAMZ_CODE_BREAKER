@@ -40,5 +40,9 @@
     <string name="daily_time">Time: %1$s</string>
     <string name="next_challenge_in_ui">Next challenge in: %1$s</string>
 
+    <string name="win_notification_text">You solved today\'s challenge in %1$d attempts!</string>
+    <string name="lose_notification_text">Try again tomorrow!</string>
+
+
 
 </resources>

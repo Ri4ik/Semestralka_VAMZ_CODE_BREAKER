@@ -41,4 +41,8 @@
     <string name="daily_time">Trvanie: %1$s</string>
     <string name="next_challenge_in_ui">Ďalšia výzva: %1$s</string>
 
+    <string name="win_notification_text">Vyhral si dnešnú výzvu za %1$d pokusy!</string>
+    <string name="lose_notification_text">Skús to znova zajtra!</string>
+
+
 </resources>

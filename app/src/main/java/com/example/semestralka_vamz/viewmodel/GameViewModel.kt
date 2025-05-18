@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.semestralka_vamz.data.AppDatabase
 import com.example.semestralka_vamz.data.model.GameStatsEntity
 import com.example.semestralka_vamz.data.model.GuessState
+import com.example.semestralka_vamz.notification.NotificationHelper
 import com.example.semestralka_vamz.store.DailyChallengeStorage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -151,8 +152,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                     _attemptsUsed.value,
                     _elapsedTime.value
                 )
-            }
 
+                val context = getApplication<Application>().applicationContext
+                if (result.isCorrect) {
+                    NotificationHelper.showWinNotification(context, _attemptsUsed.value)
+                } else {
+                    NotificationHelper.showLoseNotification(context)
+                }
+            }
             // 💾 Сохраняем статистику
             val stats = GameStatsEntity(
                 date = LocalDateTime.now(),

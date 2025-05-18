@@ -13,9 +13,6 @@ class DailyChallengeWorker(
 
     override suspend fun doWork(): Result {
         // TODO: Тут додай логіку для створення денної гри
-        Log.d("DailyChallengeWorker", "Denná výzva bola spustená")
-        // Можна зберігати флаг у SharedPreferences, що денна гра активна
-        // або показувати нотифікацію
         NotificationHelper.showNotification(applicationContext)
         return Result.success()
     }
